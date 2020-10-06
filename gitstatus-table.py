@@ -1,6 +1,7 @@
 import argparse
 import github
 import sys
+import csv
 
 from github import Github
 
@@ -23,9 +24,11 @@ def main():
 	###### MILESTONES #######
 	all_milestones = source.get_milestones()
 	if all_milestones:
+		out = csv.writer(open("milestones_" + repo.split("/")[1] + ".csv","w"), delimiter=',',quoting=csv.QUOTE_ALL)
 		gh_exception = github.GithubException
 		for milestone in all_milestones:
 			try:
+				out.writerow([milestone.id, milestone.title, milestone.due_on])
 				print("Created Milestone: "+milestone.title)
 			except gh_exception as e:
 				if e.status == 422:
@@ -44,10 +47,12 @@ def main():
 	###### ISSUES #######
 	all_issues = source.get_issues()
 	if all_issues:
+		out = csv.writer(open("issues_" + repo.split("/")[1] + ".csv","w"), delimiter=',',quoting=csv.QUOTE_ALL)
 		gh_exception = github.GithubException
 		for issue in all_issues:
 			try:
 				print("Created Issue: "+issue.title)
+				out.writerow([issue.number, issue.title])
 			except gh_exception as e:
 				if e.status == 422:
 					print("Issue "+issue.title+" already exists. Skipping.")
@@ -58,6 +63,7 @@ def main():
 		sys.exit(1)
 	else:
 		print("No issues found. None migrated")
+
 	sys.exit(0)
 
 
