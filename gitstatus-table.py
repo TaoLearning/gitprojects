@@ -21,45 +21,43 @@ def main():
 	source = github_wth_token.get_repo(repo)
 
 	###### MILESTONES #######
-	if args.milestones:
-		all_milestones = source.get_milestones()
-		if all_milestones:
-			gh_exception = github.GithubException
-			for milestone in all_milestones:
-				try:
-					print("Created Milestone: "+milestone.title)
-				except gh_exception as e:
-					if e.status == 422:
-						if args.update == True:
-							print("Ability to update Milestone "+milestone.title+" coming in next version. Skipping.")
-						else:
-							print("Milestone "+milestone.title+" already exists. Skipping.")
-				except AssertionError:
-					print("Skipping Milestone: "+milestone.title+". Add manually if needed.")
-		elif all_milestones == False:
-			print("ERROR: Milestones failed to be retrieved. Exiting...")
-			sys.exit(1)
-		else:
-			print("No milestones found. None migrated")
+	all_milestones = source.get_milestones()
+	if all_milestones:
+		gh_exception = github.GithubException
+		for milestone in all_milestones:
+			try:
+				print("Created Milestone: "+milestone.title)
+			except gh_exception as e:
+				if e.status == 422:
+					if args.update == True:
+						print("Ability to update Milestone "+milestone.title+" coming in next version. Skipping.")
+					else:
+						print("Milestone "+milestone.title+" already exists. Skipping.")
+			except AssertionError:
+				print("Skipping Milestone: "+milestone.title+". Add manually if needed.")
+	elif all_milestones == False:
+		print("ERROR: Milestones failed to be retrieved. Exiting...")
+		sys.exit(1)
+	else:
+		print("No milestones found. None migrated")
 
 	###### ISSUES #######
-	if args.issues:
-		all_issues = source.get_issues()
-		if all_issues:
-			gh_exception = github.GithubException
-			for issue in all_issues:
-				try:
-					print("Created Issue: "+issue.title)
-				except gh_exception as e:
-					if e.status == 422:
-						print("Issue "+issue.title+" already exists. Skipping.")
-				except AssertionError:
-					print("Skipping Issue: "+issue.title+". Add manually if needed.")
-		elif all_issues == False:
-			print("ERROR: Issues failed to be retrieved. Exiting...")
-			sys.exit(1)
-		else:
-			print("No issues found. None migrated")
+	all_issues = source.get_issues()
+	if all_issues:
+		gh_exception = github.GithubException
+		for issue in all_issues:
+			try:
+				print("Created Issue: "+issue.title)
+			except gh_exception as e:
+				if e.status == 422:
+					print("Issue "+issue.title+" already exists. Skipping.")
+			except AssertionError:
+				print("Skipping Issue: "+issue.title+". Add manually if needed.")
+	elif all_issues == False:
+		print("ERROR: Issues failed to be retrieved. Exiting...")
+		sys.exit(1)
+	else:
+		print("No issues found. None migrated")
 	sys.exit(0)
 
 
