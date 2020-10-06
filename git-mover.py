@@ -1,5 +1,9 @@
-import argparse, sys, github
+import argparse
+import github
+import sys
+
 from github import Github
+
 
 def main():
 	parser = argparse.ArgumentParser(description='Migrate Milestones, Labels, and Issues between two GitHub repositories. To migrate a subset of elements (Milestones, Labels, Issues), use the element specific flags (--milestones, --lables, --issues). Providing no flags defaults to all element types being migrated.')
@@ -19,7 +23,7 @@ def main():
 
 	destination_repo = args.destination_repo
 	source_repo = args.source_repo
-	g = Github(args.token)
+	github_with_token = Github(args.token)
 
 	if (args.sourceRoot != 'https://api.github.com'):
 		args.sourceRoot += '/api/v3'
@@ -30,7 +34,7 @@ def main():
 	if (args.sourceRoot != args.destinationRoot):
 		if not (args.destinationToken):
 			print("Error: Source and Destination Roots are different but no token was supplied for the destination repo.")
-			quit()
+			sys.exit(1)
 
 	if not (args.destinationUserName):
 		print('No destination User Name provided, defaulting to source User Name: '+args.user_name)
@@ -48,18 +52,20 @@ def main():
 		args.labels = True
 		args.issues = True
 
-	source = g.get_repo(source_repo)
-	destination = g.get_repo(destination_repo)
+	source = github_with_token.get_repo(source_repo)
+	destination = github_with_token.get_repo(destination_repo)
 
 	###### MILESTONES #######
 	if args.milestones:
 		all_milestones = source.get_milestones()
 		if all_milestones:
+			create_milestone = destination.create_milestone
+			gh_exception = github.GithubException
 			for milestone in all_milestones:
 				try:
-					var = destination.create_milestone(title=milestone.title, state=milestone.state, description=milestone.description, due_on=milestone.due_on)
+					var = create_milestone(title=milestone.title, state=milestone.state, description=milestone.description, due_on=milestone.due_on)
 					print("Created Milestone: "+milestone.title)
-				except github.GithubException as e:
+				except gh_exception as e:
 					if e.status == 422:
 						if args.update == True:
 							# TASK: Add ability to update existing milestones. ###############################
@@ -71,7 +77,7 @@ def main():
 					print("Skipping Milestone: "+milestone.title+". Add manually if needed.")
 		elif all_milestones == False:
 			print("ERROR: Milestones failed to be retrieved. Exiting...")
-			quit()
+			sys.exit(1)
 		else:
 			print("No milestones found. None migrated")
 	
@@ -79,16 +85,18 @@ def main():
 	if args.labels:
 		all_labels = source.get_labels()
 		if all_labels:
+			create_label = destination.create_label
+			gh_exception = github.GithubException
 			for label in all_labels:
 				try:
-					destination.create_label(name=label.name, color=label.color, description=label.description)
+					create_label(name=label.name, color=label.color, description=label.description)
 					print("Created Label: "+label.name)
-				except github.GithubException as e:
+				except gh_exception as e:
 					if e.status == 422:
 						print("Label "+label.name+" already exists. Skipping.")
 		elif all_labels == False:
 			print("ERROR: Labels failed to be retrieved. Exiting...")
-			quit()
+			sys.exit(1)
 		else:
 			print("No labels found. None migrated")
 
@@ -107,9 +115,10 @@ def main():
 					print("Skipping Issue: "+issue.title+". Add manually if needed.")
 		elif all_issues == False:
 			print("ERROR: Issues failed to be retrieved. Exiting...")
-			quit()
+			sys.exit(1)
 		else:
 			print("No issues found. None migrated")
+	sys.exit(0)
 
 if __name__ == "__main__":
 	main()

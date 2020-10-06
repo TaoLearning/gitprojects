@@ -1,5 +1,10 @@
-import argparse, sys, github
+import argparse
+import github
+import sys
+import csv
+
 from github import Github
+
 
 def main():
 	parser = argparse.ArgumentParser(description='Create a table depicting of up to 5 milestones with the status of each issue inside them.')
@@ -9,52 +14,57 @@ def main():
 	args = parser.parse_args()
 
 	repo = args.repo
-	g = Github(args.token)
+	github_wth_token = Github(args.token)
 
 	if (args.root != 'https://api.github.com'):
 		args.root += '/api/v3'
 
-	source = g.get_repo(repo)
+	source = github_wth_token.get_repo(repo)
 
 	###### MILESTONES #######
-	if args.milestones:
-		all_milestones = source.get_milestones()
-		if all_milestones:
-			for milestone in all_milestones:
-				try:
-					print("Created Milestone: "+milestone.title)
-				except github.GithubException as e:
-					if e.status == 422:
-						if args.update == True:
-							print("Ability to update Milestone "+milestone.title+" coming in next version. Skipping.")
-						else:
-							print("Milestone "+milestone.title+" already exists. Skipping.")
-				except AssertionError:
-					print("Skipping Milestone: "+milestone.title+". Add manually if needed.")
-		elif all_milestones == False:
-			print("ERROR: Milestones failed to be retrieved. Exiting...")
-			quit()
-		else:
-			print("No milestones found. None migrated")
+	all_milestones = source.get_milestones()
+	if all_milestones:
+		out = csv.writer(open("milestones_" + repo.split("/")[1] + ".csv","w"), delimiter=',',quoting=csv.QUOTE_ALL)
+		gh_exception = github.GithubException
+		for milestone in all_milestones:
+			try:
+				out.writerow([milestone.id, milestone.title, milestone.due_on])
+				print("Created Milestone: "+milestone.title)
+			except gh_exception as e:
+				if e.status == 422:
+					if args.update == True:
+						print("Ability to update Milestone "+milestone.title+" coming in next version. Skipping.")
+					else:
+						print("Milestone "+milestone.title+" already exists. Skipping.")
+			except AssertionError:
+				print("Skipping Milestone: "+milestone.title+". Add manually if needed.")
+	elif all_milestones == False:
+		print("ERROR: Milestones failed to be retrieved. Exiting...")
+		sys.exit(1)
+	else:
+		print("No milestones found. None migrated")
 
 	###### ISSUES #######
-	if args.issues:
-		all_issues = source.get_issues()
-		if all_issues:
-			for issue in all_issues:
-				try:
-					destination.create_issue(title=issue.title, body=issue.body, assignees=issue.assignees, milestone=issue.milestone, labels=issue.labels)
-					print("Created Issue: "+issue.title)
-				except github.GithubException as e:
-					if e.status == 422:
-						print("Issue "+issue.title+" already exists. Skipping.")
-				except AssertionError:
-					print("Skipping Issue: "+issue.title+". Add manually if needed.")
-		elif all_issues == False:
-			print("ERROR: Issues failed to be retrieved. Exiting...")
-			quit()
-		else:
-			print("No issues found. None migrated")
+	all_issues = source.get_issues()
+	if all_issues:
+		out = csv.writer(open("issues_" + repo.split("/")[1] + ".csv","w"), delimiter=',',quoting=csv.QUOTE_ALL)
+		gh_exception = github.GithubException
+		for issue in all_issues:
+			try:
+				print("Created Issue: "+issue.title)
+				out.writerow([issue.number, issue.title])
+			except gh_exception as e:
+				if e.status == 422:
+					print("Issue "+issue.title+" already exists. Skipping.")
+			except AssertionError:
+				print("Skipping Issue: "+issue.title+". Add manually if needed.")
+	elif all_issues == False:
+		print("ERROR: Issues failed to be retrieved. Exiting...")
+		sys.exit(1)
+	else:
+		print("No issues found. None migrated")
+
+	sys.exit(0)
 
 
 # 🔨 <a href="https://github.com/TaoFruit/iguanahive/milestone/1">LifeCycle Mgt</a> 	| 👯 Customer Journey 	| 📑 Narratives 	|
