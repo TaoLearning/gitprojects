@@ -59,11 +59,13 @@ def main():
 	if args.milestones:
 		all_milestones = source.get_milestones()
 		if all_milestones:
+			create_milestone = destination.create_milestone
+			gh_exception = github.GithubException
 			for milestone in all_milestones:
 				try:
-					var = destination.create_milestone(title=milestone.title, state=milestone.state, description=milestone.description, due_on=milestone.due_on)
+					var = create_milestone(title=milestone.title, state=milestone.state, description=milestone.description, due_on=milestone.due_on)
 					print("Created Milestone: "+milestone.title)
-				except github.GithubException as e:
+				except gh_exception as e:
 					if e.status == 422:
 						if args.update == True:
 							# TASK: Add ability to update existing milestones. ###############################
@@ -83,11 +85,13 @@ def main():
 	if args.labels:
 		all_labels = source.get_labels()
 		if all_labels:
+			create_label = destination.create_label
+			gh_exception = github.GithubException
 			for label in all_labels:
 				try:
-					destination.create_label(name=label.name, color=label.color, description=label.description)
+					create_label(name=label.name, color=label.color, description=label.description)
 					print("Created Label: "+label.name)
-				except github.GithubException as e:
+				except gh_exception as e:
 					if e.status == 422:
 						print("Label "+label.name+" already exists. Skipping.")
 		elif all_labels == False:

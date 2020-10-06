@@ -24,10 +24,11 @@ def main():
 	if args.milestones:
 		all_milestones = source.get_milestones()
 		if all_milestones:
+			gh_exception = github.GithubException
 			for milestone in all_milestones:
 				try:
 					print("Created Milestone: "+milestone.title)
-				except github.GithubException as e:
+				except gh_exception as e:
 					if e.status == 422:
 						if args.update == True:
 							print("Ability to update Milestone "+milestone.title+" coming in next version. Skipping.")
@@ -45,11 +46,13 @@ def main():
 	if args.issues:
 		all_issues = source.get_issues()
 		if all_issues:
+			create_issue = destination.create_issue
+			gh_exception = github.GithubException
 			for issue in all_issues:
 				try:
-					destination.create_issue(title=issue.title, body=issue.body, assignees=issue.assignees, milestone=issue.milestone, labels=issue.labels)
+					create_issue(title=issue.title, body=issue.body, assignees=issue.assignees, milestone=issue.milestone, labels=issue.labels)
 					print("Created Issue: "+issue.title)
-				except github.GithubException as e:
+				except gh_exception as e:
 					if e.status == 422:
 						print("Issue "+issue.title+" already exists. Skipping.")
 				except AssertionError:
