@@ -1,5 +1,8 @@
-import argparse, sys, github
+import argparse
+import github
+
 from github import Github
+
 
 def main():
 	parser = argparse.ArgumentParser(description='Create a table depicting of up to 5 milestones with the status of each issue inside them.')

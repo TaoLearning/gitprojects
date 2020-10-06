@@ -1,5 +1,8 @@
-import argparse, sys, github
+import argparse
+import github
+
 from github import Github
+
 
 def main():
 	parser = argparse.ArgumentParser(description='Migrate Milestones, Labels, and Issues between two GitHub repositories. To migrate a subset of elements (Milestones, Labels, Issues), use the element specific flags (--milestones, --lables, --issues). Providing no flags defaults to all element types being migrated.')
