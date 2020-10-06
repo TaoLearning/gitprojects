@@ -1,5 +1,6 @@
 import argparse
 import github
+import sys
 
 from github import Github
 
@@ -36,7 +37,7 @@ def main():
 					print("Skipping Milestone: "+milestone.title+". Add manually if needed.")
 		elif all_milestones == False:
 			print("ERROR: Milestones failed to be retrieved. Exiting...")
-			quit()
+			sys.exit(1)
 		else:
 			print("No milestones found. None migrated")
 
@@ -55,9 +56,10 @@ def main():
 					print("Skipping Issue: "+issue.title+". Add manually if needed.")
 		elif all_issues == False:
 			print("ERROR: Issues failed to be retrieved. Exiting...")
-			quit()
+			sys.exit(1)
 		else:
 			print("No issues found. None migrated")
+	sys.exit(0)
 
 
 # 🔨 <a href="https://github.com/TaoFruit/iguanahive/milestone/1">LifeCycle Mgt</a> 	| 👯 Customer Journey 	| 📑 Narratives 	|

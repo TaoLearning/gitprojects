@@ -1,5 +1,6 @@
 import argparse
 import github
+import sys
 
 from github import Github
 
@@ -33,7 +34,7 @@ def main():
 	if (args.sourceRoot != args.destinationRoot):
 		if not (args.destinationToken):
 			print("Error: Source and Destination Roots are different but no token was supplied for the destination repo.")
-			quit()
+			sys.exit(1)
 
 	if not (args.destinationUserName):
 		print('No destination User Name provided, defaulting to source User Name: '+args.user_name)
@@ -74,7 +75,7 @@ def main():
 					print("Skipping Milestone: "+milestone.title+". Add manually if needed.")
 		elif all_milestones == False:
 			print("ERROR: Milestones failed to be retrieved. Exiting...")
-			quit()
+			sys.exit(1)
 		else:
 			print("No milestones found. None migrated")
 	
@@ -91,7 +92,7 @@ def main():
 						print("Label "+label.name+" already exists. Skipping.")
 		elif all_labels == False:
 			print("ERROR: Labels failed to be retrieved. Exiting...")
-			quit()
+			sys.exit(1)
 		else:
 			print("No labels found. None migrated")
 
@@ -110,9 +111,10 @@ def main():
 					print("Skipping Issue: "+issue.title+". Add manually if needed.")
 		elif all_issues == False:
 			print("ERROR: Issues failed to be retrieved. Exiting...")
-			quit()
+			sys.exit(1)
 		else:
 			print("No issues found. None migrated")
+	sys.exit(0)
 
 if __name__ == "__main__":
 	main()
