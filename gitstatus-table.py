@@ -46,11 +46,9 @@ def main():
 	if args.issues:
 		all_issues = source.get_issues()
 		if all_issues:
-			create_issue = destination.create_issue
 			gh_exception = github.GithubException
 			for issue in all_issues:
 				try:
-					create_issue(title=issue.title, body=issue.body, assignees=issue.assignees, milestone=issue.milestone, labels=issue.labels)
 					print("Created Issue: "+issue.title)
 				except gh_exception as e:
 					if e.status == 422:
