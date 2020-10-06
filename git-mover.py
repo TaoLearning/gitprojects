@@ -22,7 +22,7 @@ def main():
 
 	destination_repo = args.destination_repo
 	source_repo = args.source_repo
-	g = Github(args.token)
+	github_with_token = Github(args.token)
 
 	if (args.sourceRoot != 'https://api.github.com'):
 		args.sourceRoot += '/api/v3'
@@ -51,8 +51,8 @@ def main():
 		args.labels = True
 		args.issues = True
 
-	source = g.get_repo(source_repo)
-	destination = g.get_repo(destination_repo)
+	source = github_with_token.get_repo(source_repo)
+	destination = github_with_token.get_repo(destination_repo)
 
 	###### MILESTONES #######
 	if args.milestones:

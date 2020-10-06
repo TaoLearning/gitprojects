@@ -12,12 +12,12 @@ def main():
 	args = parser.parse_args()
 
 	repo = args.repo
-	g = Github(args.token)
+	github_wth_token = Github(args.token)
 
 	if (args.root != 'https://api.github.com'):
 		args.root += '/api/v3'
 
-	source = g.get_repo(repo)
+	source = github_wth_token.get_repo(repo)
 
 	###### MILESTONES #######
 	if args.milestones:
